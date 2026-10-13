@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import { setupApp } from "./setup-app";
 
 const PORT = process.env.PORT || 3000;
