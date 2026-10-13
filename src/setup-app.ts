@@ -21,6 +21,12 @@ export const setupApp = (app: Express) => {
     // Один водитель по id.
     app.get('/drivers/:id', (req: Request<{ id: string }>, res: Response) => {
         const driver = db.drivers.find((d) => d.id === +req.params.id);
+
+        if (!driver) {
+            res.sendStatus(HttpStatuses.NotFound_404);
+            return;
+        }
+
         res.status(HttpStatuses.Ok_200).send(driver);
     });
 
@@ -47,7 +53,7 @@ export const setupApp = (app: Express) => {
     });
 
     // Тестовый эндпоинт: полностью зачищает данные в БД (для e2e-тестов).
-    app.delete('/testing/all-data', (req: Request, res: Response) => {
+    app.delete('/testing/all-data', (_req: Request, res: Response) => {
         db.drivers = [];
         res.sendStatus(HttpStatuses.NoContent_204);
     });
