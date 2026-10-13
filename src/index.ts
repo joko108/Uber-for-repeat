@@ -1,15 +1,13 @@
 import express, { Request, Response } from "express";
-
-const app = express();
-
-app.use(express.json());
-
-app.get('/', (req: Request, res: Response) => {
-    res.status(200).send('Hello World!');
-});
+import { setupApp } from "./setup-app";
 
 const PORT = process.env.PORT || 3000;
 
+// Экземляр Express приложения.
+const app = express();
+setupApp(app);
+
+// Запуск сервера.
 app.listen(PORT, () => {
-    console.log(`Example app listening on port: ${PORT}`);
+    console.log(`Expample app listening on port: ${PORT}`);
 });
