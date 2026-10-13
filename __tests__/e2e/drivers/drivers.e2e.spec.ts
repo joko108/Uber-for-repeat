@@ -9,14 +9,14 @@ describe('Driver API Test', () => {
     setupApp(app);
 
     const testDriverData: DriverInputDto = {
-        name: 'Sergeich',
-        phoneNumber: '123-456-789',
-        email: 'sergeich@example.com',
-        vehicleMake: 'Ford',
-        vehicleModel: 'Focus',
-        vehicleYear: 2011,
-        vehicleLicensePlate: 'v001or23rus',
-        vehicleDescription: 'my life - my rules',
+        name: 'Alex',
+        phoneNumber: '123-456-7980',
+        email: 'alex@example.com',
+        vehicleMake: 'BMW',
+        vehicleModel: 'X5',
+        vehicleYear: 2021,
+        vehicleLicensePlate: 'ABC-123',
+        vehicleDescription: null,
         vehicleFeatures: [],
     };
 
@@ -24,12 +24,12 @@ describe('Driver API Test', () => {
         await request(app).delete('/testing/all-data').expect(HttpStatuses.NoContent_204);
     });
 
-    it('should create driver; POST /drivers', async () => {
+    it('should create new driver; POST /drivers', async () => {
         const newDriver: DriverInputDto = {
             ...testDriverData,
-            name: 'Sergeich',
-            phoneNumber: '123-456-789',
-            email: 'sergeich@example.com',
+            name: 'Alex',
+            phoneNumber: '123-456-7980',
+            email: 'alex@example.com',
         };
 
         await request(app)
@@ -46,29 +46,29 @@ describe('Driver API Test', () => {
 
         await request(app)
             .post('/drivers')
-            .send({ ...testDriverData, name: 'Another Driver2' })
+            .send({ ...testDriverData, name: 'Another Driver1' })
             .expect(HttpStatuses.Created_201);
 
-        const driverListResponse = await request(app)
+        const getDriversList = await request(app)
             .get('/drivers')
             .expect(HttpStatuses.Ok_200);
 
-        expect(driverListResponse.body).toBeInstanceOf(Array);
-        expect(driverListResponse.body.length).toBeGreaterThanOrEqual(2);
+        expect(getDriversList.body).toBeInstanceOf(Array);
+        expect(getDriversList.body.length).toBeGreaterThanOrEqual(2);
     });
 
-    it('should be return driver by id; GET /drivers/:id', async () => {
-        const createResponse = await request(app)
+    it('should return one driver by id; GET /drivers', async () => {
+        const createdDriver = await request(app)
             .post('/drivers')
             .send({ ...testDriverData, name: 'Another Driver' })
             .expect(HttpStatuses.Created_201);
 
-        const getResponse = await request(app)
-            .get(`/drivers/${createResponse.body.id}`)
+        const responseDriver = await request(app)
+            .get(`/drivers/${createdDriver.body.id}`)
             .expect(HttpStatuses.Ok_200);
 
-        expect(getResponse.body).toEqual({
-            ...createResponse.body,
+        expect(responseDriver.body).toEqual({
+            ...createdDriver.body,
             id: expect.any(Number),
             createdAt: expect.any(String),
         });
