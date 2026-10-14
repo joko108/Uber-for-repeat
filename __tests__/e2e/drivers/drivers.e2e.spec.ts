@@ -3,6 +3,7 @@ import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { DriverInputDto } from "../../../src/drivers/dto/driver.input.dto";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
+import { VehicleFeature } from "../../../src/drivers/types/driver";
 
 describe('Driver API Tests', () => {
     const app = express();
@@ -72,5 +73,53 @@ describe('Driver API Tests', () => {
             id: expect.any(Number),
             createdAt: expect.any(String),
         });
+    });
+
+    it('should update driver by id; PUT /drivers/:id', async () => {
+        const createdDriver = await request(app)
+            .post('/drivers')
+            .send({ ...testDriverData, name: 'Another Driver' })
+            .expect(HttpStatus.Created_201);
+
+        const driverUpdateData: DriverInputDto = {
+            name: 'Update Name',
+            phoneNumber: '999-888-7777',
+            email: 'updated@example.com',
+            vehicleMake: 'Tesla',
+            vehicleModel: 'Model S',
+            vehicleYear: 2022,
+            vehicleLicensePlate: 'NEW-789',
+            vehicleDescription: 'Updated vehicle description',
+            vehicleFeatures: [VehicleFeature.ChildSeat],
+        };
+
+        await request(app)
+            .put(`/drivers/${createdDriver.body.id}`)
+            .send(driverUpdateData)
+            .expect(HttpStatus.NoContent_204);
+
+        const driverResponse = await request(app)
+            .get(`/drivers/${createdDriver.body.id}`);
+
+        expect(driverResponse.body).toEqual({
+            ...driverUpdateData,
+            id: createdDriver.body.id,
+            createdAt: expect.any(String),
+        });
+    });
+
+    it('should delete driver dy id; DELETE /drivers/:id', async () => {
+        const createdDriver = await request(app)
+            .post('/drivers')
+            .send({ ...testDriverData, name: 'Another Driver' })
+            .expect(HttpStatus.Created_201);
+
+        await request(app)
+            .delete(`/drivers/${createdDriver.body.id}`)
+            .expect(HttpStatus.NoContent_204);
+
+        const driverResponse = await request(app)
+            .get(`/drivers/${createdDriver.body.id}`)
+            .expect(HttpStatus.NotFound_404);
     });
 });
