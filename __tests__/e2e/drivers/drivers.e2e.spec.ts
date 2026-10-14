@@ -2,7 +2,7 @@ import request from 'supertest';
 import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { DriverInputDto } from "../../../src/drivers/dto/driver.input.dto";
-import {HttpStatuses} from "../../../src/core/types/http-statuses";
+import { HttpStatuses } from "../../../src/core/types/http-statuses";
 
 describe('Driver API Tests', () => {
     const app = express();

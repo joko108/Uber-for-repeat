@@ -42,6 +42,7 @@ export const setupApp = (app: Express) => {
 
         if (errors.length > 0) {
             res.status(HttpStatuses.BadRequest_400).send(createErrorMessage(errors));
+            return;
         }
 
         const lastDriver = db.drivers[db.drivers.length - 1];

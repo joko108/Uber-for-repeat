@@ -20,7 +20,7 @@ export const validateDriverInputDto = (data: DriverInputDto): ValidationError[] 
         errors.push({ field: 'phoneNumber', message: 'Invalid phoneNumber' });
     }
 
-    if (isInvalidString(data.email, 5, 50) || EMAIL_REGEX.test(data.email)) {
+    if (isInvalidString(data.email, 5, 50) || !EMAIL_REGEX.test(data.email)) {
         errors.push({ field: 'email', message: 'Invalid email' });
     }
 
