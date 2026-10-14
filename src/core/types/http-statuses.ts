@@ -1,4 +1,4 @@
-export enum HttpStatuses {
+export enum HttpStatus {
     Ok_200 = 200,
     Created_201 = 201,
     NoContent_204 = 204,

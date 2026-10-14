@@ -3,7 +3,7 @@ import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { DriverInputDto } from "../../../src/drivers/dto/driver.input.dto";
 import { VehicleFeature } from "../../../src/drivers/types/driver";
-import { HttpStatuses } from "../../../src/core/types/http-statuses";
+import { HttpStatus } from "../../../src/core/types/http-statuses";
 
 describe('Driver API body validation chek', () => {
     const app = express();
@@ -22,7 +22,7 @@ describe('Driver API body validation chek', () => {
     };
 
     beforeAll(async () => {
-        await request(app).delete('/testing/all-data').expect(HttpStatuses.NoContent_204);
+        await request(app).delete('/testing/all-data').expect(HttpStatus.NoContent_204);
     });
 
     it(`shouldn't create driver when incorrect body passed; POST /drivers`, async () => {
@@ -35,7 +35,7 @@ describe('Driver API body validation chek', () => {
                 email: 'Invalid email',
                 vehicleMake: '',
             })
-            .expect(HttpStatuses.BadRequest_400);
+            .expect(HttpStatus.BadRequest_400);
 
         expect(invalidDataSet1.body.errorMessages).toBeInstanceOf(Array);
         expect(invalidDataSet1.body.errorMessages).toHaveLength(4);
@@ -50,7 +50,7 @@ describe('Driver API body validation chek', () => {
                 vehicleLicensePlate: '',
                 vehicleFeatures: ['drink alcohol 🍺']
             })
-            .expect(HttpStatuses.BadRequest_400);
+            .expect(HttpStatus.BadRequest_400);
 
         expect(invalidDataSet2.body.errorMessages).toBeInstanceOf(Array);
         expect(invalidDataSet2.body.errorMessages).toHaveLength(5);
@@ -61,7 +61,7 @@ describe('Driver API body validation chek', () => {
                 ...correctTestDriverData,
                 name: 'A',
             })
-            .expect(HttpStatuses.BadRequest_400);
+            .expect(HttpStatus.BadRequest_400);
 
         expect(invalidDataSet3.body.errorMessages).toBeInstanceOf(Array);
         expect(invalidDataSet3.body.errorMessages).toHaveLength(1);
