@@ -118,7 +118,7 @@ describe('Driver API Tests', () => {
             .delete(`/drivers/${createdDriver.body.id}`)
             .expect(HttpStatus.NoContent_204);
 
-        const driverResponse = await request(app)
+        await request(app)
             .get(`/drivers/${createdDriver.body.id}`)
             .expect(HttpStatus.NotFound_404);
     });
