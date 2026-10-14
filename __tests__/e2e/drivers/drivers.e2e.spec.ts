@@ -2,20 +2,20 @@ import request from 'supertest';
 import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { DriverInputDto } from "../../../src/drivers/dto/driver.input.dto";
-import { HttpStatuses } from "../../../src/core/http-statuses";
+import {HttpStatuses} from "../../../src/core/http-statuses";
 
-describe('Driver API Test', () => {
+describe('Driver API Tests', () => {
     const app = express();
     setupApp(app);
 
     const testDriverData: DriverInputDto = {
         name: 'Alex',
-        phoneNumber: '123-456-7980',
+        phoneNumber: '123-456-7890',
         email: 'alex@example.com',
-        vehicleMake: 'BMW',
-        vehicleModel: 'X5',
-        vehicleYear: 2021,
-        vehicleLicensePlate: 'ABC-123',
+        vehicleMake: 'Ford',
+        vehicleModel: 'Focus',
+        vehicleYear: 2011,
+        vehicleLicensePlate: '3456-56',
         vehicleDescription: null,
         vehicleFeatures: [],
     };
@@ -25,16 +25,16 @@ describe('Driver API Test', () => {
     });
 
     it('should create new driver; POST /drivers', async () => {
-        const newDriver: DriverInputDto = {
+        const getNewDriver: DriverInputDto = {
             ...testDriverData,
             name: 'Alex',
-            phoneNumber: '123-456-7980',
+            phoneNumber: '123-456-7890',
             email: 'alex@example.com',
         };
 
         await request(app)
             .post('/drivers')
-            .send(newDriver)
+            .send(getNewDriver)
             .expect(HttpStatuses.Created_201);
     });
 
@@ -46,28 +46,28 @@ describe('Driver API Test', () => {
 
         await request(app)
             .post('/drivers')
-            .send({ ...testDriverData, name: 'Another Driver1' })
+            .send({ ...testDriverData, name: 'Another Driver2' })
             .expect(HttpStatuses.Created_201);
 
-        const getDriversList = await request(app)
+        const getDriversListResponse = await request(app)
             .get('/drivers')
             .expect(HttpStatuses.Ok_200);
 
-        expect(getDriversList.body).toBeInstanceOf(Array);
-        expect(getDriversList.body.length).toBeGreaterThanOrEqual(2);
+        expect(getDriversListResponse.body).toBeInstanceOf(Array);
+        expect(getDriversListResponse.body.length).toBeGreaterThanOrEqual(2);
     });
 
-    it('should return one driver by id; GET /drivers', async () => {
+    it('should return one driver by id; GET /drivers/:id', async () => {
         const createdDriver = await request(app)
             .post('/drivers')
             .send({ ...testDriverData, name: 'Another Driver' })
             .expect(HttpStatuses.Created_201);
 
-        const responseDriver = await request(app)
+        const getDriverResponse = await request(app)
             .get(`/drivers/${createdDriver.body.id}`)
             .expect(HttpStatuses.Ok_200);
 
-        expect(responseDriver.body).toEqual({
+        expect(getDriverResponse.body).toEqual({
             ...createdDriver.body,
             id: expect.any(Number),
             createdAt: expect.any(String),
