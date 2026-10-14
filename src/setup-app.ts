@@ -1,8 +1,10 @@
 import express, { Express, Request, Response } from "express";
-import { HttpStatuses } from "./core/http-statuses";
+import { HttpStatuses } from "./core/types/http-statuses";
 import { db } from "./db/in-memory.db";
 import { DriverInputDto } from "./drivers/dto/driver.input.dto";
 import { Driver } from "./drivers/types/driver";
+import { createErrorMessage } from "./core/utils/error.utils";
+import { validateDriverInputDto } from "./drivers/validation/driver-input-dto.validation";
 
 export const setupApp = (app: Express) => {
     // Парсим JSON.
@@ -23,7 +25,11 @@ export const setupApp = (app: Express) => {
         const driver = db.drivers.find((d) => d.id === +req.params.id);
 
         if (!driver) {
-            res.sendStatus(HttpStatuses.NotFound_404);
+            res
+                .status(HttpStatuses.NotFound_404)
+                .send(
+                    createErrorMessage([{ field: 'id', message: 'Driver not found' }])
+                );
             return;
         }
 
@@ -32,6 +38,12 @@ export const setupApp = (app: Express) => {
 
     // Создание водителя.
     app.post('/drivers', (req: Request<{}, {}, DriverInputDto>, res: Response) => {
+        const errors = validateDriverInputDto(req.body);
+
+        if (errors.length > 0) {
+            res.status(HttpStatuses.BadRequest_400).send(createErrorMessage(errors));
+        }
+
         const lastDriver = db.drivers[db.drivers.length - 1];
 
         const newDriver: Driver = {
