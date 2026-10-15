@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { db } from "../../db/in-memory.db";
 import { HttpStatus } from "../../core/types/http-statuses";
 import { createErrorMessage } from "../../core/utils/error.utils";
+import { driversRepository } from "../repositories/drivers.repository";
 
 export const deleteDriverHandler = (req: Request<{ id: string }>, res: Response) => {
-    const index = db.drivers.findIndex((d) => d.id === +req.params.id);
+    const isDeleted = driversRepository.delete(+req.params.id);
 
-    if (index === -1) {
+    if (!isDeleted) {
         res
             .status(HttpStatus.NotFound_404)
             .send(
@@ -15,6 +15,5 @@ export const deleteDriverHandler = (req: Request<{ id: string }>, res: Response)
         return;
     }
 
-    db.drivers.splice(index, 1);
     res.sendStatus(HttpStatus.NoContent_204);
 };

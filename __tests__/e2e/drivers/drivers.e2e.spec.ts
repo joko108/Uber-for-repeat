@@ -4,6 +4,8 @@ import { setupApp } from "../../../src/setup-app";
 import { DriverInputDto } from "../../../src/drivers/dto/driver.input.dto";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { VehicleFeature } from "../../../src/drivers/types/driver";
+import { TESTING_PATH } from "../../../src/testing/constants/testing.paths";
+import { DRIVERS_PATH } from "../../../src/drivers/constants/drivers.paths";
 
 describe('Driver API Tests', () => {
     const app = express();
@@ -22,7 +24,7 @@ describe('Driver API Tests', () => {
     };
 
     beforeAll(async () => {
-        await request(app).delete('/testing/all-data').expect(HttpStatus.NoContent_204);
+        await request(app).delete(`${TESTING_PATH}/all-data`).expect(HttpStatus.NoContent_204);
     });
 
     it('should create new driver; POST /drivers', async () => {
@@ -34,24 +36,24 @@ describe('Driver API Tests', () => {
         };
 
         await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send(getNewDriver)
             .expect(HttpStatus.Created_201);
     });
 
     it('should return drivers list; GET /drivers', async () => {
         await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({ ...testDriverData, name: 'Another Driver1' })
             .expect(HttpStatus.Created_201);
 
         await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({ ...testDriverData, name: 'Another Driver2' })
             .expect(HttpStatus.Created_201);
 
         const getDriversListResponse = await request(app)
-            .get('/drivers')
+            .get(DRIVERS_PATH)
             .expect(HttpStatus.Ok_200);
 
         expect(getDriversListResponse.body).toBeInstanceOf(Array);
@@ -60,12 +62,12 @@ describe('Driver API Tests', () => {
 
     it('should return one driver by id; GET /drivers/:id', async () => {
         const createdDriver = await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({ ...testDriverData, name: 'Another Driver' })
             .expect(HttpStatus.Created_201);
 
         const getDriverResponse = await request(app)
-            .get(`/drivers/${createdDriver.body.id}`)
+            .get(`${DRIVERS_PATH}/${createdDriver.body.id}`)
             .expect(HttpStatus.Ok_200);
 
         expect(getDriverResponse.body).toEqual({
@@ -77,7 +79,7 @@ describe('Driver API Tests', () => {
 
     it('should update driver by id; PUT /drivers/:id', async () => {
         const createdDriver = await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({ ...testDriverData, name: 'Another Driver' })
             .expect(HttpStatus.Created_201);
 
@@ -94,12 +96,12 @@ describe('Driver API Tests', () => {
         };
 
         await request(app)
-            .put(`/drivers/${createdDriver.body.id}`)
+            .put(`${DRIVERS_PATH}/${createdDriver.body.id}`)
             .send(driverUpdateData)
             .expect(HttpStatus.NoContent_204);
 
         const driverResponse = await request(app)
-            .get(`/drivers/${createdDriver.body.id}`);
+            .get(`${DRIVERS_PATH}/${createdDriver.body.id}`);
 
         expect(driverResponse.body).toEqual({
             ...driverUpdateData,
@@ -110,16 +112,16 @@ describe('Driver API Tests', () => {
 
     it('should delete driver dy id; DELETE /drivers/:id', async () => {
         const createdDriver = await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({ ...testDriverData, name: 'Another Driver' })
             .expect(HttpStatus.Created_201);
 
         await request(app)
-            .delete(`/drivers/${createdDriver.body.id}`)
+            .delete(`${DRIVERS_PATH}/${createdDriver.body.id}`)
             .expect(HttpStatus.NoContent_204);
 
         await request(app)
-            .get(`/drivers/${createdDriver.body.id}`)
+            .get(`${DRIVERS_PATH}/${createdDriver.body.id}`)
             .expect(HttpStatus.NotFound_404);
     });
 });

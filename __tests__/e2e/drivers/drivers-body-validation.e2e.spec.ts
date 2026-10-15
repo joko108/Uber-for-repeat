@@ -4,6 +4,8 @@ import { setupApp } from "../../../src/setup-app";
 import { DriverInputDto } from "../../../src/drivers/dto/driver.input.dto";
 import { VehicleFeature } from "../../../src/drivers/types/driver";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
+import { TESTING_PATH } from "../../../src/testing/constants/testing.paths";
+import { DRIVERS_PATH } from "../../../src/drivers/constants/drivers.paths";
 
 describe('Driver API body validation chek', () => {
     const app = express();
@@ -22,12 +24,12 @@ describe('Driver API body validation chek', () => {
     };
 
     beforeAll(async () => {
-        await request(app).delete('/testing/all-data').expect(HttpStatus.NoContent_204);
+        await request(app).delete(`${TESTING_PATH}/all-data`).expect(HttpStatus.NoContent_204);
     });
 
     it(`shouldn't create driver when incorrect body passed; POST /drivers`, async () => {
         const invalidDataSet1 = await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({
                 ...correctTestDriverData,
                 name: '    ',
@@ -41,7 +43,7 @@ describe('Driver API body validation chek', () => {
         expect(invalidDataSet1.body.errorMessages).toHaveLength(4);
 
         const invalidDataSet2 = await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({
                 ...correctTestDriverData,
                 phoneNumber: '',
@@ -55,7 +57,7 @@ describe('Driver API body validation chek', () => {
         expect(invalidDataSet2.body.errorMessages).toHaveLength(4);
 
         const invalidDataSet3 = await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({
                 ...correctTestDriverData,
                 name: 'A',
@@ -66,18 +68,18 @@ describe('Driver API body validation chek', () => {
         expect(invalidDataSet3.body.errorMessages).toHaveLength(1);
 
         // Проверяем, что ни один невалидный водитель не создался.
-        const driverListResponse = await request(app).get('/drivers');
+        const driverListResponse = await request(app).get(DRIVERS_PATH);
         expect(driverListResponse.body).toHaveLength(0);
     });
 
     it(`shouldn't update driver when incorrect body passed; PUT /drivers/:id`, async () => {
         const { body: { id: createdDriverId } } = await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({ ...correctTestDriverData })
             .expect(HttpStatus.Created_201);
 
         const invalidDataSet1 = await request(app)
-            .put(`/drivers/${createdDriverId}`)
+            .put(`${DRIVERS_PATH}/${createdDriverId}`)
             .send({
                 ...correctTestDriverData,
                 name: '    ',
@@ -91,7 +93,7 @@ describe('Driver API body validation chek', () => {
         expect(invalidDataSet1.body.errorMessages).toHaveLength(4);
 
         const invalidDataSet2 = await request(app)
-            .put(`/drivers/${createdDriverId}`)
+            .put(`${DRIVERS_PATH}/${createdDriverId}`)
             .send({
                 ...correctTestDriverData,
                 phoneNumber: '',
@@ -105,7 +107,7 @@ describe('Driver API body validation chek', () => {
         expect(invalidDataSet2.body.errorMessages).toHaveLength(4);
 
         const invalidDataSet3 = await request(app)
-            .put(`/drivers/${createdDriverId}`)
+            .put(`${DRIVERS_PATH}/${createdDriverId}`)
             .send({
                 ...correctTestDriverData,
                 name: 'A',
@@ -116,7 +118,7 @@ describe('Driver API body validation chek', () => {
         expect(invalidDataSet3.body.errorMessages).toHaveLength(1);
 
         const getResponse = await request(app)
-            .get(`/drivers/${createdDriverId}`);
+            .get(`${DRIVERS_PATH}/${createdDriverId}`);
 
         expect(getResponse.body).toEqual({
             ...correctTestDriverData,
@@ -127,12 +129,12 @@ describe('Driver API body validation chek', () => {
 
     it(`shouldn't update driver when incorrect features passed; PUT /driver/:id`, async () => {
         const { body: { id: createdDriverId } } = await request(app)
-            .post('/drivers')
+            .post(DRIVERS_PATH)
             .send({ ...correctTestDriverData })
             .expect(HttpStatus.Created_201);
 
         await request(app)
-            .put(`/drivers/${createdDriverId}`)
+            .put(`${DRIVERS_PATH}/${createdDriverId}`)
             .send({
                 ...correctTestDriverData,
                 vehicleFeatures: [
@@ -144,7 +146,7 @@ describe('Driver API body validation chek', () => {
             .expect(HttpStatus.BadRequest_400);
 
         const getResponse = await request(app)
-            .get(`/drivers/${createdDriverId}`);
+            .get(`${DRIVERS_PATH}/${createdDriverId}`);
 
         expect(getResponse.body).toEqual({
             ...correctTestDriverData,

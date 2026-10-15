@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../core/types/http-statuses";
-import { db }  from "../../db/in-memory.db";
 import { createErrorMessage } from "../../core/utils/error.utils";
+import {driversRepository} from "../repositories/drivers.repository";
 
 export const getDriverHandler = (req: Request<{ id: string }>, res: Response) => {
-    const driver = db.drivers.find((d) => d.id === +req.params.id);
+    const driver = driversRepository.findById(+req.params.id);
 
     if (!driver) {
         res
