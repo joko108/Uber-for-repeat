@@ -2,6 +2,8 @@ import express, { Express, Request, Response } from "express";
 import { HttpStatus } from "./core/types/http-statuses";
 import { driversRouter } from "./drivers/routers/dirvers.router";
 import { testingRouter } from "./testing/router/testing.router";
+import { DRIVERS_PATH } from "./drivers/constants/drivers.paths";
+import { TESTING_PATH } from "./testing/constants/testing.paths";
 
 export const setupApp = (app: Express) => {
     // Парсим JSON.
@@ -13,8 +15,8 @@ export const setupApp = (app: Express) => {
     });
 
     // Каждый модуль подключается к своему базовому пути.
-    app.use('/drivers', driversRouter);
-    app.use('/testing', testingRouter)
+    app.use(DRIVERS_PATH, driversRouter);
+    app.use(TESTING_PATH, testingRouter)
 
     return app;
 };
