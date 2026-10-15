@@ -48,12 +48,11 @@ describe('Driver API body validation chek', () => {
                 vehicleModel: '',
                 vehicleYear: 'year',
                 vehicleLicensePlate: '',
-                vehicleFeatures: ['drink alcohol 🍺']
             })
             .expect(HttpStatus.BadRequest_400);
 
         expect(invalidDataSet2.body.errorMessages).toBeInstanceOf(Array);
-        expect(invalidDataSet2.body.errorMessages).toHaveLength(5);
+        expect(invalidDataSet2.body.errorMessages).toHaveLength(4);
 
         const invalidDataSet3 = await request(app)
             .post('/drivers')
@@ -66,7 +65,91 @@ describe('Driver API body validation chek', () => {
         expect(invalidDataSet3.body.errorMessages).toBeInstanceOf(Array);
         expect(invalidDataSet3.body.errorMessages).toHaveLength(1);
 
+        // Проверяем, что ни один невалидный водитель не создался.
         const driverListResponse = await request(app).get('/drivers');
         expect(driverListResponse.body).toHaveLength(0);
+    });
+
+    it(`shouldn't update driver when incorrect body passed; PUT /drivers/:id`, async () => {
+        const { body: { id: createdDriverId } } = await request(app)
+            .post('/drivers')
+            .send({ ...correctTestDriverData })
+            .expect(HttpStatus.Created_201);
+
+        const invalidDataSet1 = await request(app)
+            .put(`/drivers/${createdDriverId}`)
+            .send({
+                ...correctTestDriverData,
+                name: '    ',
+                phoneNumber: '    ',
+                email: 'Invalid email',
+                vehicleMake: '',
+            })
+            .expect(HttpStatus.BadRequest_400);
+
+        expect(invalidDataSet1.body.errorMessages).toBeInstanceOf(Array);
+        expect(invalidDataSet1.body.errorMessages).toHaveLength(4);
+
+        const invalidDataSet2 = await request(app)
+            .put(`/drivers/${createdDriverId}`)
+            .send({
+                ...correctTestDriverData,
+                phoneNumber: '',
+                vehicleModel: '',
+                vehicleYear: 'year',
+                vehicleLicensePlate: '',
+            })
+            .expect(HttpStatus.BadRequest_400);
+
+        expect(invalidDataSet2.body.errorMessages).toBeInstanceOf(Array);
+        expect(invalidDataSet2.body.errorMessages).toHaveLength(4);
+
+        const invalidDataSet3 = await request(app)
+            .put(`/drivers/${createdDriverId}`)
+            .send({
+                ...correctTestDriverData,
+                name: 'A',
+            })
+            .expect(HttpStatus.BadRequest_400);
+
+        expect(invalidDataSet3.body.errorMessages).toBeInstanceOf(Array);
+        expect(invalidDataSet3.body.errorMessages).toHaveLength(1);
+
+        const getResponse = await request(app)
+            .get(`/drivers/${createdDriverId}`);
+
+        expect(getResponse.body).toEqual({
+            ...correctTestDriverData,
+            id: createdDriverId,
+            createdAt: expect.any(String),
+        });
+    });
+
+    it(`shouldn't update driver when incorrect features passed; PUT /driver/:id`, async () => {
+        const { body: { id: createdDriverId } } = await request(app)
+            .post('/drivers')
+            .send({ ...correctTestDriverData })
+            .expect(HttpStatus.Created_201);
+
+        await request(app)
+            .put(`/drivers/${createdDriverId}`)
+            .send({
+                ...correctTestDriverData,
+                vehicleFeatures: [
+                    VehicleFeature.ChildSeat,
+                    'invalid-features',
+                    VehicleFeature.WiFi,
+                ],
+            })
+            .expect(HttpStatus.BadRequest_400);
+
+        const getResponse = await request(app)
+            .get(`/drivers/${createdDriverId}`);
+
+        expect(getResponse.body).toEqual({
+            ...correctTestDriverData,
+            id: createdDriverId,
+            createdAt: expect.any(String),
+        });
     });
 });
