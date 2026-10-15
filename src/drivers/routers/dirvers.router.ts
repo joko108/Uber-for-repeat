@@ -8,10 +8,16 @@ import { deleteDriverHandler } from "../handlers/delete-driver.handler";
 import { idValidation } from "../../core/middlewares/validation/params-id.validation.middleware";
 import { inputValidationResultMiddleware } from "../../core/middlewares/validation/input-validation-result.middleware";
 import { driverInputDtoValidation } from "../validation/driver-input-dto.validation-middlewares";
+import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard.middleware";
 
 // Отдельный роутер для маршрутов, связанных с водителями.
 export const driversRouter = Router({});
 
+// Все эндпоинты водителей доступны только супер-админу (Basic Auth).
+driversRouter.use(superAdminGuardMiddleware);
+
+// Каждая цепочка: валидация -> проверка ее результата -> handler.
+// Пути маршрутов берем из констант модуля, а не из строковых литералов.
 driversRouter
     .get(DRIVERS_ROUTES.ROOT, getDriverListHandler)
 

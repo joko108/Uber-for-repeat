@@ -1,11 +1,12 @@
 import express from "express";
 import { setupApp } from "./setup-app";
-
-const PORT = process.env.PORT || 3000;
+import { SETTINGS } from "./settings/config";
 
 // Экземпляр Express приложения.
 const app = express();
 setupApp(app);
+
+const PORT = SETTINGS.PORT;
 
 // Запуск сервера.
 app.listen(PORT, () => {
